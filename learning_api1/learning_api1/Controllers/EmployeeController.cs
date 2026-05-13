@@ -38,17 +38,17 @@ namespace Learning_api1.Controllers
         //    return Created("", _emp);
         //}
 
-        public IActionResult AddEmployee(int id, string name, double salary)
+        public IActionResult AddEmployee([FromBody]Employee _add)
         {
-            if (string.IsNullOrWhiteSpace(name) || id <= 0 || salary <= 0)
+            if (string.IsNullOrWhiteSpace(_add.Name) || _add.Id <= 0 || _add.Salary <= 0)
             {
                 return BadRequest("Invalid input. Please provide a valid name, Id, and salary.");
             }
             Employee newEmplbox = new Employee
             {
-                Id = id,
-                Name = name,
-                Salary = salary
+                Id = _add.Id,
+                Name = _add.Name,
+                Salary = _add.Salary
             };
             _emp.Add(newEmplbox);
             return Created("", _emp);
@@ -73,6 +73,30 @@ namespace Learning_api1.Controllers
             }
             return Ok(ee);
 
+        }
+
+        [HttpPut("{id}")]
+        public IActionResult UpdateEmpById(int id, [FromBody]Employee _update)
+        {
+            var ee = _emp.FirstOrDefault(e => e.Id == id);
+            if(ee==null)
+                return NotFound("Employee not found.");
+
+            ee.Name = _update.Name;
+            ee.Salary = _update.Salary;
+            return Ok(new { UpdatedEmployee = ee, AllEmployees = _emp });
+            //return Ok(ee);
+        }
+
+        [HttpDelete("{id}")]
+        public IActionResult DeleteEmpById(int id)
+        {
+            var ee=_emp.FirstOrDefault(e => e.Id == id);
+            if(ee==null)
+                return NotFound("Employee not found.");
+
+            _emp.Remove(ee);
+            return Ok(new { UpdatedAllEmp = _emp });
         }
     }
 }
